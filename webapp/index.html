@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Document</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.2.2/dist/web3.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/merkletreejs@latest/merkletree.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/keccak256@latest/keccak256.js">
+      // https://www.npmjs.com/package/keccak256
+  </script>
+
+  <script type="module" src="interact.js"></script>
+
+  </style>
+</head>
+
+<body>
+  <div id="admin-div">
+    <div class="card">
+      <button id="btn1">connect MetaMask</button>
+      <div>
+        <div>merkle-root:</div>
+        <div id="merkle-root"></div>
+      </div>
+
+      <button id="btn2">get</button>
+      <button id="btn4">set</button>
+    </div>
+
+    <div class="card">
+      <div>merkle-proof:
+        <span id="merkle-proof"></span>
+      </div>
+
+      <div>balance:
+        <span id="balance">
+        </span>
+      </div>
+
+      <button id="btn3">early mint</button>
+      <button id="btn5">get balance</button>
+    </div>
+
+  </div>
+  <div id="user-div">
+  </div>
+</body>
+
+</html>

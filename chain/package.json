@@ -1,0 +1,29 @@
+{
+  "name": "chain",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy": "hardhat run",
+    "verify": "npx hardhat verify --network goerli",
+    "test": "hardhat test",
+    "blocknode": "hardhat node",
+    "rx": "remixd -s . --remix-ide https://remix.ethereum.org",
+    "clean": "rm -rf .deps && rm -rf artifacts && rm -rf cache"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.1.1",
+    "ethers": "^5.7.1",
+    "hardhat": "^2.11.2"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.7.3",
+    "dotenv": "^16.0.3",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.2.32"
+  }
+}
