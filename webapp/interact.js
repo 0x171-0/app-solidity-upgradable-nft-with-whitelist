@@ -166,6 +166,7 @@ export function setAccount() {
     if (acc.length > 0) {
       console.log("✅ account list...", acc);
       account = acc[0];
+      whiteListAddressed.push(account);
       contractInstance = new SchoolContract(contractAddress);
       merkleUtil = new MerkleUtil();
     }
