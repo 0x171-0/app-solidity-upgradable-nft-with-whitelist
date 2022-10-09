@@ -1,6 +1,7 @@
 # Steps
 
-- add your account to whiteListAddressed
+- Update the ERC721 contract address
+- Run the web server with docker
 
 ```
 docker build -t aws-token . --no-cache
