@@ -31,14 +31,11 @@ contract AppWorks is ERC721, Ownable {
    =            MODIFIERS            =
    =================================*/
     modifier isOneTimeMintAmountValid(uint256 _mintAmount) {
-        require(
-            _mintAmount > maxMintAmountOneTime,
-            "Over max one time mint amount"
-        );
+        require(_mintAmount > maxMintPerTx, "Over max one time mint amount");
         _;
     }
     /**
-     * @dev Check how many NFTs are available to be minted
+     * @notice Check how many NFTs are available to be minted
      *  Set mint per user limit to 10 and owner limit to 20 - Week 8
      */
     modifier isMintAmountValid(uint256 _mintAmount) {
@@ -51,7 +48,8 @@ contract AppWorks is ERC721, Ownable {
         _;
     }
     /**
-     * @dev Check user has sufficient funds. Solidity 底層會自己把 ether 轉 wei 計算，不用再轉
+     * @notice Check user has sufficient funds.
+     * Solidity witll change ether to wei, so we don't have to multiply 10**18 ourselves
      */
     modifier isValueValid(uint256 _mintAmount) {
         require(msg.value >= price * _mintAmount, "Value is not enough");
@@ -61,28 +59,22 @@ contract AppWorks is ERC721, Ownable {
    =            CONFIGURABLES            =
    =====================================*/
     Counters.Counter private _nextTokenId;
-    // token 多少錢
-    uint256 public price = 0.01 ether;
-    // 總供應量
+    uint256 public price = 0.01 ether; // price for each token
     uint256 public constant maxSupply = 100;
-    // 公開販售
     bool public mintActive = false;
-    // 事前販售
     bool public earlyMintActive = false;
-    // 盲盒揭露
-    bool public revealed = false;
-    // 回傳 JSON 存放 NFT 在區塊鏈外的資訊
+    bool public revealed = false; // reveal mystery box or not
     uint public earlyMintMaxBalance = 3;
     uint public ownerMaxBalance = 20;
     uint public userMaxBalance = 10;
-    uint256 public maxMintAmountOneTime = 5;
+    uint256 public maxMintPerTx = 5;
     /*================================
    =            DATASETS            =
    ================================*/
     string public baseURI;
-    string public mysteryTokenURI;
-    bytes32 public merkleRoot;
-    mapping(address => uint256) public whiteListClaimed;
+    string public mysteryTokenURI; // mystery box image URL
+    bytes32 public merkleRoot; // whitelist root
+    mapping(address => uint256) public whiteListClaimed; // whitelist token amounts which already cliameded
     mapping(uint256 => string) private _tokenURIs;
     mapping(address => uint256) public balance;
 
@@ -92,15 +84,14 @@ contract AppWorks is ERC721, Ownable {
    =            PUBLIC FUNCTIONS            =
    =======================================*/
     /**
-     * @dev Function to return current total NFT being minted - week 8
-     * NFT 總供應量
+     * @notice return current total NFT being minted
      */
     function totalSupply() public view returns (uint) {
         return _nextTokenId.current();
     }
 
     /**
-     * @dev See {IERC721Metadata-tokenURI}.
+     * @notice See {IERC721Metadata-tokenURI}.
      */
     function tokenURI(uint256 tokenId)
         public
@@ -124,7 +115,7 @@ contract AppWorks is ERC721, Ownable {
     }
 
     /**
-     * @dev Early mint function for people on the whitelist - week 9
+     * @notice Early mint function for people on the whitelist
      */
     function earlyMint(bytes32[] calldata _merkleProof, uint256 _mintAmount)
         public
@@ -174,14 +165,15 @@ contract AppWorks is ERC721, Ownable {
     }
 
     /**
-     *  @dev Implement setMerkleRoot(merkleRoot) Function to set new merkle root - week 9
+     *  @notice set new merkle root
      */
     function setMerkleRoot(bytes32 _merkleRoot) external onlyOwner {
         merkleRoot = _merkleRoot;
     }
 
-    // 提領餘額
-    // Implement withdrawBalance() Function to withdraw funds from the contract - week 8
+    /**
+     * @notice withdraw funds from the contract
+     */
     function withdrawBalance() external onlyOwner {
         require(address(this).balance > 0, "Balance is 0");
         (bool success, ) = payable(owner()).call{value: address(this).balance}(
@@ -190,37 +182,31 @@ contract AppWorks is ERC721, Ownable {
         require(success, "Withdraw failed");
     }
 
-    // 設定價格
-    // Implement setPrice(price) Function to set the mint price - week 8
+    /**
+     * @notice set the mint price
+     */
     function setPrice(uint _price) external onlyOwner {
         price = _price;
     }
 
-    // Implement setBaseURI(newBaseURI) Function to set BaseURI - week 9
     function setBaseURI(string calldata _newBaseURI) external onlyOwner {
         baseURI = _newBaseURI;
     }
 
-    // 決定能不能開採
-    // Implement toggleMint() Function to toggle the public mint available or not - week 8
     function toggleMint() external onlyOwner {
         mintActive = !mintActive;
     }
 
-    // Implement toggleReveal() Function to toggle the blind box is revealed - week 9
     function toggleReveal() external onlyOwner {
         revealed = !revealed;
     }
 
-    /**
-     *  @dev Implement toggleEarlyMint() Function to toggle the early mint available or not - week 9
-     */
     function toggleEarlyMint() external onlyOwner {
         earlyMintActive = !earlyMintActive;
     }
 
-    // Let this contract can be upgradable, using openzepplin proxy library - week 10
-    // Try to modify blind box images by using proxy
+    // TODO: Let this contract can be upgradable, using openzepplin proxy library - week 10
+    // TODO:  Try to modify blind box images by using proxy
 
     /*==========================================
    =            INTERNAL FUNCTIONS            =
@@ -240,13 +226,17 @@ contract AppWorks is ERC721, Ownable {
     }
 
     /**
-     *  @dev Function to return the NFT base URI
-     *  ex: image url...
+     *  @notice return the NFT base URI
+     *  ex: image base url...
      */
     function _baseURI() internal view virtual override returns (string memory) {
         return baseURI;
     }
 
+    /**
+     *  @notice return mystry box image
+     *  ex: mystry box image url...
+     */
     function _mysteryTokenURI() public view returns (string memory) {
         return mysteryTokenURI;
     }
