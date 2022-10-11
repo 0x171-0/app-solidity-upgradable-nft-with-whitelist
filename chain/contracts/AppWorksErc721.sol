@@ -64,9 +64,9 @@ contract AppWorks is ERC721, Ownable {
     bool public mintActive = false;
     bool public earlyMintActive = false;
     bool public revealed = false; // reveal mystery box or not
-    uint public earlyMintMaxBalance = 3;
-    uint public ownerMaxBalance = 20;
-    uint public userMaxBalance = 10;
+    uint256 public earlyMintMaxBalance = 3;
+    uint256 public ownerMaxBalance = 20;
+    uint256 public userMaxBalance = 10;
     uint256 public maxMintPerTx = 5;
     /*================================
    =            DATASETS            =
@@ -86,7 +86,7 @@ contract AppWorks is ERC721, Ownable {
     /**
      * @notice return current total NFT being minted
      */
-    function totalSupply() public view returns (uint) {
+    function totalSupply() public view returns (uint256) {
         return _nextTokenId.current();
     }
 
@@ -185,7 +185,7 @@ contract AppWorks is ERC721, Ownable {
     /**
      * @notice set the mint price
      */
-    function setPrice(uint _price) external onlyOwner {
+    function setPrice(uint256 _price) external onlyOwner {
         price = _price;
     }
 
@@ -217,7 +217,7 @@ contract AppWorks is ERC721, Ownable {
             tokenId + _mintAmount < maxSupply,
             "Require amount is over total supply"
         );
-        for (uint i = 0; i < _mintAmount; i++) {
+        for (uint256 i = 0; i < _mintAmount; i++) {
             _safeMint(msg.sender, tokenId);
             tokenId++; // 一定不會超過 100，所以不會爆掉
         }
