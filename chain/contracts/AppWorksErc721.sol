@@ -20,6 +20,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/MerkleProof.sol
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
+import "@openzeppelin/hardhat-upgrades";
+
 contract AppWorks is ERC721, Ownable {
     /*=================================
    =            LIBRARIES            =
@@ -217,12 +219,14 @@ contract AppWorks is ERC721, Ownable {
             tokenId + _mintAmount < maxSupply,
             "Require amount is over total supply"
         );
+        // @dev storage balance update must put before _safemint for prevent reentrantcy
+        balance[msg.sender] += _mintAmount;
+
         for (uint256 i = 0; i < _mintAmount; i++) {
             _safeMint(msg.sender, tokenId);
             tokenId++; // 一定不會超過 100，所以不會爆掉
         }
         _nextTokenId._value = tokenId;
-        balance[msg.sender] += _mintAmount; // 一定不會超過 20
     }
 
     /**
