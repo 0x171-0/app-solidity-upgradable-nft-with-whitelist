@@ -1,5 +1,0 @@
-{
-  "dependencies": {
-    "@openzeppelin/hardhat-upgrades": "^1.21.0"
-  }
-}
