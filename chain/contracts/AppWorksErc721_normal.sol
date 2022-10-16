@@ -4,12 +4,11 @@ pragma solidity ^0.8.9;
 
 // 📜 ERC721 Library
 // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/ERC721.sol
-// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 // 📜 Auth Library for varify ownership
 // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
-// import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 // 📜 Counter Library for calculate tokenId
 // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Counters.sol
@@ -19,25 +18,12 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/MerkleProof.sol
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
-// Open Zeppelin libraries for controlling upgradability and access.
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-
-// TODO:  Try to modify blind box images by using proxy
-
-contract AppWorks is
-    Initializable,
-    ERC721Upgradeable,
-    OwnableUpgradeable,
-    UUPSUpgradeable
-{
+contract AppWorksNormal is ERC721, Ownable {
     /*=================================
    =            LIBRARIES            =
    =================================*/
     using MerkleProof for bytes32[];
-    using StringsUpgradeable for uint256;
+    using Strings for uint256;
     using Counters for Counters.Counter;
     /*=================================
    =            MODIFIERS            =
@@ -71,52 +57,26 @@ contract AppWorks is
    =            CONFIGURABLES            =
    =====================================*/
     Counters.Counter private _nextTokenId;
-    uint256 public price; // price for each token
-    uint256 public maxSupply;
-    bool public mintActive;
-    bool public earlyMintActive;
-    bool public revealed; // reveal mystery box or not
-    uint256 public earlyMintMaxBalance;
-    uint256 public ownerMaxBalance;
-    uint256 public userMaxBalance;
-    uint256 public maxMintPerTx;
+    uint256 public price = 0.01 ether; // price for each token
+    uint256 public constant maxSupply = 100;
+    bool public mintActive = false;
+    bool public earlyMintActive = false;
+    bool public revealed = false; // reveal mystery box or not
+    uint256 public earlyMintMaxBalance = 3;
+    uint256 public ownerMaxBalance = 20;
+    uint256 public userMaxBalance = 10;
+    uint256 public maxMintPerTx = 5;
     /*================================
    =            DATASETS            =
    ================================*/
     string public baseURI;
-    string private _mysteryTokenURI; // mystery box image URL
+    string public _mysteryTokenURI; // mystery box image URL
     bytes32 public merkleRoot; // whitelist root
     mapping(address => uint256) public whiteListClaimed; // whitelist token amounts which already cliameded
     mapping(uint256 => string) private _tokenURIs;
     mapping(address => uint256) public balance;
 
-    /**
-     * @notice This method is required to safeguard from unauthorized upgrades
-     * because in the UUPS pattern the upgrade is done from the implementation contract,
-     * whereas in the transparent proxy pattern, the upgrade is done via the proxy contract
-     */
-    function _authorizeUpgrade(address) internal override onlyOwner {}
-
-    /**
-     * @notice Upgradable contracts should have an initialize method in place of constructors,
-     * and also the initializer keyword makes sure that the contract is initialized only once
-     */
-    function initialize(string memory _name, string memory _symbol)
-        public
-        initializer
-    {
-        __ERC721_init(_name, _symbol);
-        __Ownable_init();
-        price = 0.01 ether;
-        maxSupply = 50;
-        mintActive = false;
-        earlyMintActive = false;
-        revealed = false;
-        earlyMintMaxBalance = 3;
-        ownerMaxBalance = 20;
-        userMaxBalance = 10;
-        maxMintPerTx = 5;
-    }
+    constructor() ERC721("AppWorks", "AW") {}
 
     /*=======================================
    =            PUBLIC FUNCTIONS            =
@@ -188,7 +148,7 @@ contract AppWorks is
         isMintAmountValid(_mintAmount)
         isValueValid(_mintAmount)
     {
-        require(mintActive, "Public Mint is not yet started");
+        require(mintActive, "Current state is not available for Public Mint");
         _mintAndUpdateCounter(_mintAmount);
     }
 
@@ -235,14 +195,7 @@ contract AppWorks is
         baseURI = _newBaseURI;
     }
 
-    function setMysteryTokenURI(string calldata _newmysteryTokenURI)
-        external
-        onlyOwner
-    {
-        _mysteryTokenURI = _newmysteryTokenURI;
-    }
-
-    function toggleMintActive() external onlyOwner {
+    function toggleMint() external onlyOwner {
         mintActive = !mintActive;
     }
 

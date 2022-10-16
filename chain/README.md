@@ -26,4 +26,8 @@ npx hardhat run scripts/deploy.js --network goerli
 
 # interact with specific networks
 npx hardhat run scripts/interact.js --network goerli
+
+Deploying contracts with the account: 0x63A5A9CB58C33066D73AC57AB85adf861983ED73
+Account balance: 5254069048670256000
+Deployed to 0x6e45c88429DaEe71c967182CDDC28D5882Cc5a42
 ```
